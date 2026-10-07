@@ -1,0 +1,117 @@
+# ============================================================
+# dinggang CRM 应用配置
+# ============================================================
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: dinggang-crm
+
+  # 数据源
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3307}/${DB_NAME:dinggang_crm}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USER:dinggang}
+    password: ${DB_PASSWORD:dinggang123}
+
+  # Redis
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:redis123}
+      database: 0
+      timeout: 3000ms
+
+  # 文件上传
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 50MB
+
+  # Flowable 配置
+  flowable:
+    idm:
+      enabled: false  # 关闭内置IDM，使用自建RBAC
+    database-schema-update: true
+    async-executor-activate: false
+
+# ============================================================
+# MyBatis-Plus 配置
+# ============================================================
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.dinggang.crm.modules.*.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: delFlag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
+
+# ============================================================
+# Sa-Token 配置
+# ============================================================
+sa-token:
+  token-name: Authorization
+  timeout: 86400        # 登录有效期: 24小时
+  active-timeout: 1800  # 临时有效期: 30分钟
+  is-concurrent: true
+  is-share: false
+  token-style: uuid
+  is-log: false
+
+# ============================================================
+# Knife4j (API文档)
+# ============================================================
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+    enable-footer: false
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+
+# ============================================================
+# 业务自定义配置
+# ============================================================
+dinggang:
+  # AES加密密钥 (32字节Base64，生产环境从环境变量注入)
+  aes-key: ${AES_KEY:ZGVmYXVsdC1hZXMta2V5LXNlZWQtMzJieXRlcw==}
+
+  # MinIO对象存储
+  minio:
+    endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+    access-key: ${MINIO_USER:minioadmin}
+    secret-key: ${MINIO_PASSWORD:minioadmin}
+    bucket: dinggang
+
+  # AI配置
+  ai:
+    chroma-url: ${CHROMA_URL:http://localhost:8000}
+    llm:
+      api-key: ${LLM_API_KEY:}
+      base-url: ${LLM_BASE_URL:https://dashscope.aliyuncs.com/api/v1}
+      model: ${LLM_MODEL:qwen-plus}
+
+# ============================================================
+# 日志配置
+# ============================================================
+logging:
+  level:
+    com.dinggang.crm: debug
+    org.mybatis: info
